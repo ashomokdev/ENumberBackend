@@ -7,7 +7,7 @@ import java.io.IOException;
  */
 public class TesseractExecutorImpl implements TesseractExecutor {
 
-    private String pathtoTesseractEXE = "Tesseract-OCR\\tesseract.exe";
+    private final String pathtoTesseractEXE = "\\WEB-INF\\lib\\Tesseract-OCR\\tesseract.exe";
     private String testImg = "test_imgs\\DSC_0088.JPG";
     private String outPut = "test_imgs\\output";
 
@@ -15,6 +15,7 @@ public class TesseractExecutorImpl implements TesseractExecutor {
 
     @Override
     public void execute() {
+
         String[] cmd = {pathtoTesseractEXE, testImg, outPut, language};
         Process p = null;
         try {
