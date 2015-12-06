@@ -32,6 +32,25 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+
+                <configuration>
+                    <path>/</path>
+                    <serverXml>src/main/resources/tomcatconf/server.xml</serverXml>
+                    <warDirectory>target/enumbservice-0.2.0</warDirectory>
+                    <!--<webapps>-->
+                        <!--<webapp>-->
+                            <!--<groupId>com.abc</groupId>-->
+                            <!--<artifactId>appName</artifactId>-->
+                            <!--<version>7.0.1</version>-->
+                            <!--<type>war</type>-->
+                        <!--</webapp>-->
+                    <!--</webapps>-->
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import javax.servlet.ServletContext;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,6 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @RestController
 public class GreetingController {
+
 
 //    private static final String template = "Hello, %s!";
 //    private final AtomicLong counter = new AtomicLong();
@@ -29,28 +31,45 @@ public class GreetingController {
 //                String.format(template, name));
 //    }
 
-    @RequestMapping(value="/upload", method=RequestMethod.GET)
-    public @ResponseBody String provideUploadInfo() {
+    @RequestMapping(value = "/upload", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String provideUploadInfo() {
         return "You can upload a file by posting to this same URL.";
     }
 
-    @RequestMapping(value="/upload", method=RequestMethod.POST)
-    public @ResponseBody
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    public
+    @ResponseBody
     ResponseEntity handleFileUpload(@RequestParam("name") String name,
-                                    @RequestParam("file") MultipartFile file){
+                                    @RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
             try {
-                byte[] bytes = file.getBytes();
-                BufferedOutputStream stream =
-                        new BufferedOutputStream(new FileOutputStream(new File(name)));
-                stream.write(bytes);
-                stream.close();
 
-                String json = "You successfully uploaded file!";//convert entity to json
+//                //TODO create /uploads folder before
+                String orgName = file.getOriginalFilename();
+                String filePath = "/" + orgName;
+                File dest = new File(filePath);
+                file.transferTo(dest);
+
+//                ServletContext context = getContext();
+//                String fullPath = context.getRealPath("/WEB-INF/test/foo.txt");
+
+                TesseractExecutor executor = new TesseractExecutorImpl(filePath, filePath+".txt");
+                executor.execute();
+
+
+//                byte[] bytes = file.getBytes();
+//                BufferedOutputStream stream =
+//                        new BufferedOutputStream(new FileOutputStream(new File(name)));
+//                stream.write(bytes);
+//                stream.close();
+
+                String json = "You successfully uploaded file!" ;//convert entity to json
                 return new ResponseEntity(json, HttpStatus.ACCEPTED);
 
             } catch (Exception e) {
-                return new ResponseEntity("You failed to upload file.", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity("You failed to upload file." + e.getMessage(), HttpStatus.BAD_REQUEST);
 
             }
         } else {
@@ -58,14 +77,10 @@ public class GreetingController {
         }
     }
 
-
-
-
-
-
-
-
-
+//    private ServletContext getContext() {
+//
+//
+//    }
 
 
 //
