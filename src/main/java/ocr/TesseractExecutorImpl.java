@@ -3,7 +3,6 @@ package ocr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,12 +27,7 @@ public class TesseractExecutorImpl implements TesseractExecutor {
 
     @Override
     public void execute() {
-        /*ServletContext context = getContext();
-        String fullPath = context.getRealPath("/WEB-INF/test/foo.txt");*/
 
-//        Runtime.getRuntime().exec()
-
-//        File file = new File("./webapp/WEB-INF/lib/Tesseract-OCR/tesseract.exe");
         File file = new File(this.getClass().getClassLoader().getResource(".").getPath());
 
         String osrFilePath = file.getParentFile()
@@ -41,7 +35,7 @@ public class TesseractExecutorImpl implements TesseractExecutor {
                 .concat("\\enumbservice-0.2.0\\WEB-INF\\lib\\Tesseract-OCR\\tesseract.exe");
 
         File osrFile = new File(osrFilePath);
-//                "./webapp/WEB-INF/lib/Tesseract-OCR/tesseract.exe");
+
         log.info("{}, {}", osrFile.getAbsoluteFile(), osrFile.exists());
 
         if (osrFile.exists())
