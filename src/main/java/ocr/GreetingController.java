@@ -1,5 +1,6 @@
 package ocr;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,12 @@ import java.util.concurrent.atomic.AtomicLong;
 @RestController
 public class GreetingController {
 
+    public ServletContext getServletContext() {
+        return servletContext;
+    }
+
+    @Autowired
+    private ServletContext servletContext;
 
 //    private static final String template = "Hello, %s!";
 //    private final AtomicLong counter = new AtomicLong();
@@ -45,17 +52,15 @@ public class GreetingController {
                                     @RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
             try {
-
-//                //TODO create /uploads folder before
+               //TODO create /uploads folder before
                 String orgName = file.getOriginalFilename();
                 String filePath = "/" + orgName;
                 File dest = new File(filePath);
                 file.transferTo(dest);
 
-//                ServletContext context = getContext();
-//                String fullPath = context.getRealPath("/WEB-INF/test/foo.txt");
+                ServletContext context = getServletContext();
 
-                TesseractExecutor executor = new TesseractExecutorImpl(filePath, filePath+".txt");
+                TesseractExecutor executor = new TesseractExecutorImpl(context, filePath, filePath+".txt");
                 executor.execute();
 
 
