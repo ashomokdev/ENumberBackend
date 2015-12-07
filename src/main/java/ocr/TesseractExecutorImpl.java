@@ -24,9 +24,9 @@ public class TesseractExecutorImpl implements TesseractExecutor {
     private ServletContext context;
     HttpServletRequest request;
 
-    public TesseractExecutorImpl(ServletContext context, HttpServletRequest request, String imgPath, String outputPath) {
-        this.context = context;
+    public TesseractExecutorImpl(HttpServletRequest request, String imgPath, String outputPath) {
         this.request = request;
+        this.context = request.getServletContext();
         testImg = imgPath;
         outPut = outputPath;
     }
@@ -34,30 +34,18 @@ public class TesseractExecutorImpl implements TesseractExecutor {
 
     @Override
     public void execute() {
-        String fullPath;
-
-//        String contextPath = request.getContextPath();
-//        log.info("contextPath = {}", contextPath);
-//
-//        String pathToTesseract = context.getRealPath(pathtoTesseractEXE);
-//        log.info("pathToTesseract = {}", pathToTesseract);
-//
-//        String pathToWEBINF = context.getRealPath("WEB-INF");
-//        log.info("pathToWEB-INF = {}", pathToWEBINF);
 
         String realContextPath = context.getRealPath(request.getContextPath());
-        if (realContextPath == null) //True in Debug mode (not distributed version)
+        if (! request.getContextPath().isEmpty()) //distributed version
         {
-            realContextPath = context.getRealPath(request.getContextPath());
-        } else {
             //Delete dublicate context folder from path.
             //Example of input D:\Programs_Files\apache-tomcat-8.0.27\webapps\enumbservice-0.2.0\enumbservice-0.2.0
             //enumbservice-0.2.0\enumbservice-0.2.0\ is duplicated part
             realContextPath = new File(realContextPath).getParent();
-        }
+        } 
         log.info("realContextPath = {}", realContextPath); //C:\Users\Iuliia\IdeaProjects\ENumbersBackend\src\main\webapp\
 
-        fullPath = realContextPath.concat(pathtoTesseractEXE);
+        String fullPath = realContextPath.concat(pathtoTesseractEXE);
         log.info("pathtoTesseractEXE obtained: {}", fullPath);
 
 

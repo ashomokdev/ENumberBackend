@@ -21,26 +21,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @RestController
 public class GreetingController {
 
-    public ServletContext getServletContext() {
-        return servletContext;
-    }
-
-    @Autowired
-    private ServletContext servletContext;
 
     @Autowired
     private HttpServletRequest request;
-
-//    private static final String template = "Hello, %s!";
-//    private final AtomicLong counter = new AtomicLong();
-//
-//    @RequestMapping("/greeting")
-//    public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
-//        TesseractExecutor executor = new TesseractExecutorImpl();
-//        executor.execute();
-//        return new Greeting(counter.incrementAndGet(),
-//                String.format(template, name));
-//    }
 
     @RequestMapping(value = "/upload", method = RequestMethod.GET)
     public
@@ -61,9 +44,9 @@ public class GreetingController {
                 File dest = new File(filePath);
                 file.transferTo(dest);
 
-                ServletContext context = getServletContext();
 
-                TesseractExecutor executor = new TesseractExecutorImpl(context, request, filePath, filePath+".txt");
+
+                TesseractExecutor executor = new TesseractExecutorImpl(request, filePath, filePath+".txt");
                 executor.execute();
 
 
