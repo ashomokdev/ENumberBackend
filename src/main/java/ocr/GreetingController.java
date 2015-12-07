@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,6 +27,9 @@ public class GreetingController {
 
     @Autowired
     private ServletContext servletContext;
+
+    @Autowired
+    private HttpServletRequest request;
 
 //    private static final String template = "Hello, %s!";
 //    private final AtomicLong counter = new AtomicLong();
@@ -48,8 +52,7 @@ public class GreetingController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public
     @ResponseBody
-    ResponseEntity handleFileUpload(@RequestParam("name") String name,
-                                    @RequestParam("file") MultipartFile file) {
+    ResponseEntity handleFileUpload(@RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
             try {
                //TODO create /uploads folder before
@@ -60,7 +63,7 @@ public class GreetingController {
 
                 ServletContext context = getServletContext();
 
-                TesseractExecutor executor = new TesseractExecutorImpl(context, filePath, filePath+".txt");
+                TesseractExecutor executor = new TesseractExecutorImpl(context, request, filePath, filePath+".txt");
                 executor.execute();
 
 
