@@ -55,6 +55,7 @@
           <element id="library" level="project" name="Maven: com.jayway.restassured:rest-assured-common:2.7.0" />
           <element id="library" level="project" name="Maven: org.apache.commons:commons-lang3:3.3.2" />
           <element id="library" level="project" name="Maven: com.jayway.restassured:xml-path:2.7.0" />
+          <element id="library" level="project" name="Maven: org.apache.commons:commons-io:1.3.2" />
         </element>
       </element>
       <element id="javaee-facet-resources" facet="ENumbersBackend/web/Web Gradle : enumbers-0.1.0.war" />
