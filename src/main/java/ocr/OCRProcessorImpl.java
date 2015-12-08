@@ -1,6 +1,5 @@
 package ocr;
 
-import com.sun.istack.internal.Nullable;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,7 +132,6 @@ public class OCRProcessorImpl implements OCRProcessor {
         }
     }
 
-    @Nullable
     private String parseWord(String word) {
         Pattern pattern = Pattern.compile(REGEX_ENUMB);
         Matcher matcher = pattern.matcher(word);
