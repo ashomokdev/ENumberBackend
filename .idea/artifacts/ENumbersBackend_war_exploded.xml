@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="ENumbersBackend:war exploded">
-    <output-path>$PROJECT_DIR$/target/enumbservice-0.2.0</output-path>
+    <output-path>$PROJECT_DIR$/target/enumbservice-0.3.0</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">

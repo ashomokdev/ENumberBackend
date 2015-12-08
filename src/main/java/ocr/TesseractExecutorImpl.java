@@ -2,14 +2,11 @@ package ocr;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.rmi.runtime.Log;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 
 /**
  * Created by Iuliia on 03.12.2015.
@@ -33,7 +30,7 @@ public class TesseractExecutorImpl implements TesseractExecutor {
 
 
     @Override
-    public void execute() {
+    public String execute() {
 
         String realContextPath = context.getRealPath(request.getContextPath());
         if (! request.getContextPath().isEmpty()) //distributed version
@@ -42,58 +39,27 @@ public class TesseractExecutorImpl implements TesseractExecutor {
             //Example of input D:\Programs_Files\apache-tomcat-8.0.27\webapps\enumbservice-0.2.0\enumbservice-0.2.0
             //enumbservice-0.2.0\enumbservice-0.2.0\ is duplicated part
             realContextPath = new File(realContextPath).getParent();
-        } 
+        }
         log.info("realContextPath = {}", realContextPath); //C:\Users\Iuliia\IdeaProjects\ENumbersBackend\src\main\webapp\
 
-        String fullPath = realContextPath.concat(pathtoTesseractEXE);
-        log.info("pathtoTesseractEXE obtained: {}", fullPath);
+        String fullPathTesseractExecutor = realContextPath.concat(pathtoTesseractEXE);
+        log.info("pathtoTesseractEXE obtained: {}", fullPathTesseractExecutor);
 
 
+        String[] cmd = {fullPathTesseractExecutor, testImg, outPut, language};
         Process ocrProcess = null;
         try {
-            ocrProcess = Runtime.getRuntime().exec(fullPath);
+            ocrProcess = Runtime.getRuntime().exec(cmd);
+            ocrProcess.waitFor();
+
+            return outPut + ".txt";
         } catch (IOException e) {
-            e.printStackTrace();
-            log.error("ERROR: {}", e.getMessage());
-        }
-        log.info(" Is OCR started {}", ocrProcess.isAlive());
-
-//        File file = new File(this.getClass().getClassLoader().getResource(".").getPath());
-//
-//        String osrFilePath = file.getParentFile()
-//                .getAbsolutePath()
-//                .concat("\\enumbservice-0.2.0\\WEB-INF\\lib\\Tesseract-OCR\\tesseract.exe");
-//
-//        File osrFile = new File(osrFilePath);
-//
-//        log.info("{}, {}", osrFile.getAbsoluteFile(), osrFile.exists());
-//
-//        if (osrFile.exists())
-//            try {
-//                Process ocrProcess = Runtime.getRuntime().exec(osrFilePath);
-//                log.info(" Is OCR started {}", ocrProcess.isAlive());
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-
-//        if (!new File("WEB-INF").exists())
-//        {
-//            try {
-//                throw new FileNotFoundException("Yikes!");
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
-
-/*        String[] cmd = {osrFilePath, testImg, outPut, language};
-        Process p = null;
-        try {
-            p = Runtime.getRuntime().exec(cmd);
-            p.waitFor();
-        } catch (IOException e) {
+            log.error("IOException {}", e.getMessage());
             e.printStackTrace();
         } catch (InterruptedException e) {
+            log.error("InterruptedException {}", e.getMessage());
             e.printStackTrace();
-        }*/
+        }
+        return "";
     }
 }

@@ -1,5 +1,7 @@
 package ocr;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -21,6 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @RestController
 public class GreetingController {
 
+    private final static Logger log = LoggerFactory.getLogger(GreetingController.class);
 
     @Autowired
     private HttpServletRequest request;
@@ -38,16 +42,51 @@ public class GreetingController {
     ResponseEntity handleFileUpload(@RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
             try {
-               //TODO create /uploads folder before
+                String uploadsDir = "/uploads/";
+                String realPathtoUploads =  request.getServletContext().getRealPath(uploadsDir);
+                CreatePathIfNeeded(realPathtoUploads);
+                log.info("realPathtoUploads = {}", realPathtoUploads);
+
+
                 String orgName = file.getOriginalFilename();
-                String filePath = "/" + orgName;
+                String filePath = realPathtoUploads + orgName;
                 File dest = new File(filePath);
                 file.transferTo(dest);
 
+                String outPath = "empty";
+                if (dest.exists()) {
+
+                    String out = filePath;
+                    TesseractExecutor executor = new TesseractExecutorImpl(request, filePath, out);
+                    outPath = executor.execute();
+                    if (! new File(outPath).exists())
+                    {
+                        log.error("Result from OCR was not obtained, file {} not found", outPath);
+                    }
+                    else
+                    {
+                        log.info("Result from OCR obtained.");
+                        // //TODO recognize, parse, delete
+                    }
+                }
+                else
+                {
+                    log.error("image not uploaded, file {} not found", filePath);
+                }
 
 
-                TesseractExecutor executor = new TesseractExecutorImpl(request, filePath, filePath+".txt");
-                executor.execute();
+
+//                String realImgPath = request.getServletContext().getRealPath(filePath);
+//                log.info("realImgPath = {}", realImgPath);
+//
+//                File img = new File(realImgPath);
+//                if(!img.exists())
+//                {
+//                    log.info("NOT EXIST! realImgPath = {}", realImgPath);
+//                }
+
+
+
 
 
 //                byte[] bytes = file.getBytes();
@@ -56,7 +95,7 @@ public class GreetingController {
 //                stream.write(bytes);
 //                stream.close();
 
-                String json = "You successfully uploaded file!" ;//convert entity to json
+                String json = "Recognized result: " + outPath;//convert entity to json
                 return new ResponseEntity(json, HttpStatus.ACCEPTED);
 
             } catch (Exception e) {
@@ -65,6 +104,22 @@ public class GreetingController {
             }
         } else {
             return new ResponseEntity("You failed to upload file because the file was empty.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void CreatePathIfNeeded(String path) throws IOException {
+        File dir = new File(path);
+        if(! dir.exists())
+        {
+           boolean iscreated= dir.mkdir();
+            if (iscreated)
+            {
+                return;
+            }
+            else
+            {
+                throw new IOException("Directory "+ path+" can not be created");
+            }
         }
     }
 
