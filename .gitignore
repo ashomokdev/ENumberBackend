@@ -40,16 +40,10 @@ obj/
 ################
 target/
 out/
-.idea/
 !Example/
 
 # IDE files #
 #############
-.idea/workspace.xml
-.idea/libraries/Maven*.xml
-.idea/compiler.xml
-.idea/modules.xml
-.idea/vcs.xml
 
 # Other #
 #########
