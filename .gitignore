@@ -3,10 +3,8 @@
 *.com
 *.class
 *.dll
-*.exe
 *.o
 *.so
-target/
  
 # Packages #
 ############
@@ -22,11 +20,7 @@ target/
  
 # Logs and databases #
 ######################
-*.log
-*.sql
-*.sqlite
-!test.log
- 
+
 # OS generated files #
 ######################
 .DS_Store
