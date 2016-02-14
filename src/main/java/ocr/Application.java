@@ -27,8 +27,6 @@ public class Application extends SpringBootServletInitializer {
 
     public static void main(String[] args) throws Exception {
 
-      //  System.out.print("IN MAIN!!!!");
-    //    SpringApplication.run(Application.class, "-Djna.library.path=WEB-INF/classes/tess4j -Djna.debug_load=true");
         SpringApplication.run(Application.class, args);
     }
 

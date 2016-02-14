@@ -5,6 +5,7 @@ import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.Tesseract1;
 import net.sourceforge.tess4j.TesseractException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,10 @@ public class OCRProcessorImpl implements OCRProcessor {
     private ServletContext context;
     private String realContextPath;
 
-    private final String tessdataPath = "\\WEB-INF\\lib\\";
+    private final String tessdataPath = File.separator + "WEB-INF" + File.separator + "lib";
+
+ //   private final String tessdataPathWindows = "\\WEB-INF\\lib\\"; //for windows
+//    private final String tessdataPathLinux = "/WEB-INF/lib/"; //for linux
 
     private static final String REGEX_ENUMB = "E[ ]{0,2}[0-9]{3,4}[a-j]{0,1}";
 
@@ -49,28 +53,29 @@ public class OCRProcessorImpl implements OCRProcessor {
 
     @Override
     public String executeTessaractEXE(String imgPath, String outputPath) {
-        String fullPathTesseractExecutor = realContextPath.concat(pathtoTesseractEXE);
-        log.info("pathtoTesseractEXE obtained: {}", fullPathTesseractExecutor);
 
-        String[] cmd = {fullPathTesseractExecutor, imgPath, outputPath, language};
-        Process ocrProcess = null;
-        try {
-            ocrProcess = Runtime.getRuntime().exec(cmd);
-            ocrProcess.waitFor();
+            String fullPathTesseractExecutor = realContextPath.concat(pathtoTesseractEXE);
+            log.info("pathtoTesseractEXE obtained: {}", fullPathTesseractExecutor);
 
-            return outputPath + ".txt";
-        } catch (IOException e) {
-            log.error("IOException {}", e.getMessage());
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            log.error("InterruptedException {}", e.getMessage());
-            e.printStackTrace();
-        }
-        finally {
-            //delete uploaded image
-            new File(imgPath).delete();
-        }
-        return "";
+            String[] cmd = {fullPathTesseractExecutor, imgPath, outputPath, language};
+            Process ocrProcess = null;
+            try {
+                ocrProcess = Runtime.getRuntime().exec(cmd);
+                ocrProcess.waitFor();
+
+                return outputPath + ".txt";
+            } catch (IOException e) {
+                log.error("IOException {}", e.getMessage());
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                log.error("InterruptedException {}", e.getMessage());
+                e.printStackTrace();
+            } finally {
+                //delete uploaded image
+                new File(imgPath).delete();
+            }
+            return "";
+
     }
 
     @Override
@@ -102,6 +107,8 @@ public class OCRProcessorImpl implements OCRProcessor {
 
          //ITesseract instance = new Tesseract(); // JNA Interface Mapping
         ITesseract instance = new Tesseract1(); // JNA Direct Mapping
+
+        instance.setTessVariable("LC_NUMERIC", "C"); //for linux
 
         String fullTessdataPath = realContextPath.concat(tessdataPath);
         instance.setDatapath(fullTessdataPath);
