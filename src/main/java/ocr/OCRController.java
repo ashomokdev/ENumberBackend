@@ -9,10 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.io.File;
+
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+
 
 /**
  * Created by Iuliia on 02.12.2015.
@@ -94,32 +97,35 @@ public class OCRController {
     ResponseEntity handleFileUpload(@RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
             try {
-                String uploadsDir = "/uploads/";
-                String realPathtoUploads = request.getServletContext().getRealPath(uploadsDir);
-                CreatePathIfNeeded(realPathtoUploads);
-                log.info("realPathtoUploads = {}", realPathtoUploads);
-
 
                 String orgName = file.getOriginalFilename();
-                String filePath = realPathtoUploads + orgName;
-                File imageFile = new File(filePath);
+
+
+                File imageFile = new File(orgName);
                 file.transferTo(imageFile);
 
                 String[] jsonResult = new String[0];
-                if (imageFile.exists()) {
+
+                File pathtoImg = new File("/tmp/uploads/" + orgName); //todo ugly delete
+
+                if (pathtoImg.exists()) {
 
                     OCRProcessor processor = new OCRProcessorImpl(request);
-                    jsonResult = processor.doOCR(imageFile);
+                    jsonResult = processor.doOCR(pathtoImg);
+                }
+                else
+                {
+                    throw new Exception("Image was not saved on the disk.");
                 }
 
                 return new ResponseEntity(jsonResult, HttpStatus.ACCEPTED);
 
             } catch (Exception e) {
-                return new ResponseEntity("You failed to upload file." + e.getMessage(), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity("You failed to upload file. " + e.getMessage(), HttpStatus.BAD_REQUEST);
 
             }
         } else {
-            return new ResponseEntity("You failed to upload file because the file was empty.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("You failed to upload file because the file was empty. ", HttpStatus.BAD_REQUEST);
         }
     }
 

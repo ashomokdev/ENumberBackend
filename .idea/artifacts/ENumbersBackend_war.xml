@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="ENumbersBackend:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="enumbservice-0.3.0.war">
-      <element id="artifact" artifact-name="ENumbersBackend:war exploded" />
-    </root>
-  </artifact>
-</component>

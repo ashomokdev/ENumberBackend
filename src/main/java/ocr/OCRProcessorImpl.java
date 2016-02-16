@@ -98,10 +98,15 @@ public class OCRProcessorImpl implements OCRProcessor {
     }
 
     @Override
-    public String[] doOCR(File imageFile) {
+    public String[] doOCR(File imageFile) throws Exception {
         //33189561455 13391156620
         //14936928704 10229086919
         //16887334562
+
+        if (! imageFile.canRead())
+        {
+            throw new Exception("Image file not exist or can not be readen");
+        }
 
         long startTime = System.nanoTime();
 

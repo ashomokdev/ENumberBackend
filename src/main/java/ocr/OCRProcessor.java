@@ -28,5 +28,5 @@ public interface OCRProcessor {
      * @param imageFile
      * @return array of e-numbers
      */
-    String[] doOCR(File imageFile);
+    String[] doOCR(File imageFile) throws Exception;
 }
