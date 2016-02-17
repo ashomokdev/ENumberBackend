@@ -37,59 +37,6 @@ public class OCRController {
         return "You can upload a file by posting to this same URL.";
     }
 
-    @Deprecated
-    @RequestMapping(value = "/uploadOld", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    ResponseEntity handleFileUploadOld(@RequestParam("file") MultipartFile file) {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            if (!file.isEmpty()) {
-                try {
-                    String uploadsDir = "/uploads/";
-                    String realPathtoUploads = request.getServletContext().getRealPath(uploadsDir);
-                    CreatePathIfNeeded(realPathtoUploads);
-                    log.info("realPathtoUploads = {}", realPathtoUploads);
-
-
-                    String orgName = file.getOriginalFilename();
-                    String filePath = realPathtoUploads + orgName;
-                    File dest = new File(filePath);
-                    file.transferTo(dest);
-
-                    String outPath;
-                    String[] jsonResult = new String[0];
-                    if (dest.exists()) {
-
-                        String out = filePath;
-                        OCRProcessor processor = new OCRProcessorImpl(request);
-                        outPath = processor.executeTessaractEXE(filePath, out); //.txt sufix will be added to out.
-                        if (!new File(outPath).exists()) {
-                            log.error("Result from OCR was not obtained, file {} not found", outPath);
-                        } else {
-                            log.info("Result from OCR obtained.");
-                            jsonResult = processor.parseTXT(outPath);
-                        }
-                    } else {
-                        log.error("image not uploaded, file {} not found", filePath);
-                    }
-
-                    // String json = "Recognized result: " + outPath;//convert entity to json
-                    return new ResponseEntity(jsonResult, HttpStatus.ACCEPTED);
-
-                } catch (Exception e) {
-                    return new ResponseEntity("You failed to upload file." + e.getMessage(), HttpStatus.BAD_REQUEST);
-
-                }
-            } else {
-                return new ResponseEntity("You failed to upload file because the file was empty.", HttpStatus.BAD_REQUEST);
-            }
-        }
-        else
-        {
-            return new ResponseEntity("Server runed on Linux, but this method works on Windows only.", HttpStatus.BAD_REQUEST);
-        }
-    }
-
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public

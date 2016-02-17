@@ -1,18 +1,18 @@
 package ocr;
 
 import net.sourceforge.tess4j.ITesseract;
-import net.sourceforge.tess4j.Tesseract;
+
 import net.sourceforge.tess4j.Tesseract1;
 import net.sourceforge.tess4j.TesseractException;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.io.IOException;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -24,77 +24,13 @@ import java.util.regex.Pattern;
 public class OCRProcessorImpl implements OCRProcessor {
 
     private final static Logger log = LoggerFactory.getLogger(OCRProcessorImpl.class);
-    private static final String pathtoTesseractEXE = "\\WEB-INF\\lib\\Tesseract-OCR\\tesseract.exe";
-    private static final String language = "-l eng";
-    private ServletContext context;
-    private String realContextPath;
 
-    private final String tessdataPath = File.separator + "WEB-INF" + File.separator + "lib";
+    private final String tessdataPath = "/tmp/lib";
 
- //   private final String tessdataPathWindows = "\\WEB-INF\\lib\\"; //for windows
-//    private final String tessdataPathLinux = "/WEB-INF/lib/"; //for linux
 
     private static final String REGEX_ENUMB = "E[ ]{0,2}[0-9]{3,4}[a-j]{0,1}";
 
     public OCRProcessorImpl(HttpServletRequest request) {
-        this.context = request.getServletContext();
-
-        realContextPath = context.getRealPath(request.getContextPath());
-        if (! request.getContextPath().isEmpty()) //distributed version
-        {
-            //Delete dublicate context folder from path.
-            //Example of input D:\Programs_Files\apache-tomcat-8.0.27\webapps\enumbservice-0.2.0\enumbservice-0.2.0
-            //enumbservice-0.2.0\enumbservice-0.2.0\ is duplicated part
-            realContextPath = new File(realContextPath).getParent();
-        }
-        log.info("realContextPath = {}", realContextPath); //C:\Users\Iuliia\IdeaProjects\ENumbersBackend\src\main\webapp\
-    }
-
-
-    @Override
-    public String executeTessaractEXE(String imgPath, String outputPath) {
-
-            String fullPathTesseractExecutor = realContextPath.concat(pathtoTesseractEXE);
-            log.info("pathtoTesseractEXE obtained: {}", fullPathTesseractExecutor);
-
-            String[] cmd = {fullPathTesseractExecutor, imgPath, outputPath, language};
-            Process ocrProcess = null;
-            try {
-                ocrProcess = Runtime.getRuntime().exec(cmd);
-                ocrProcess.waitFor();
-
-                return outputPath + ".txt";
-            } catch (IOException e) {
-                log.error("IOException {}", e.getMessage());
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                log.error("InterruptedException {}", e.getMessage());
-                e.printStackTrace();
-            } finally {
-                //delete uploaded image
-                new File(imgPath).delete();
-            }
-            return "";
-
-    }
-
-    @Override
-    public String[] parseTXT(String path) {
-        File pathfile = new File(path);
-        String[] result = new String[0];
-        try {
-            String content = FileUtils.readFileToString(pathfile, "UTF-8");
-            result = parseResult(content);
-            return result;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            //delete .txt with results
-           pathfile.delete();
-        }
-        return result;
     }
 
     @Override
@@ -115,7 +51,9 @@ public class OCRProcessorImpl implements OCRProcessor {
 
         instance.setTessVariable("LC_NUMERIC", "C"); //for linux
 
-        String fullTessdataPath = realContextPath.concat(tessdataPath);
+        String fullTessdataPath = tessdataPath;
+
+
         instance.setDatapath(fullTessdataPath);
 
         try {

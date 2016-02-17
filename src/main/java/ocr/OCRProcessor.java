@@ -7,21 +7,6 @@ import java.io.File;
  */
 public interface OCRProcessor {
 
-    /**
-     *
-     * @return path to txt with result
-     */
-    @Deprecated
-    String executeTessaractEXE(String imgPath, String outputPath);
-
-
-    /**
-     *
-     * @param outPath path to txt with result
-     * @return array of e-numbers
-     */
-    @Deprecated
-    String[] parseTXT(String outPath);
 
     /**
      *
