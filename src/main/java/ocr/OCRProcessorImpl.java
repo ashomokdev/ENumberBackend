@@ -8,9 +8,8 @@ import net.sourceforge.tess4j.TesseractException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 import java.util.HashSet;
@@ -33,6 +32,7 @@ public class OCRProcessorImpl implements OCRProcessor {
     public OCRProcessorImpl(HttpServletRequest request) {
     }
 
+    @Deprecated
     @Override
     public String[] doOCR(File imageFile) throws Exception {
         //33189561455 13391156620
@@ -60,6 +60,7 @@ public class OCRProcessorImpl implements OCRProcessor {
 
             String result = instance.doOCR(imageFile);
 
+
             long endTime = System.nanoTime();
             long duration = (endTime - startTime);  //divide by 1000000 to get milliseconds.
             System.out.println( "doOCR: " + duration + "/n");
@@ -72,6 +73,28 @@ public class OCRProcessorImpl implements OCRProcessor {
 
         return new String[0];
     }
+
+    @Override
+    public String[] doOCR(BufferedImage image) {
+        //ITesseract instance = new Tesseract(); // JNA Interface Mapping
+        ITesseract instance = new Tesseract1(); // JNA Direct Mapping
+
+        String fullTessdataPath = tessdataPath;
+
+
+        instance.setDatapath(fullTessdataPath);
+
+        try {
+            String result = instance.doOCR(image);
+            return parseResult(result);
+        } catch (TesseractException e) {
+            e.printStackTrace();
+        }
+        return new String[0];
+
+
+    }
+
 
 
     private String[] parseResult(String input) {

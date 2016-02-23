@@ -1,5 +1,6 @@
 package ocr;
 
+import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,11 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 
 /**
@@ -24,7 +28,6 @@ import java.io.IOException;
 public class OCRController {
 
     private final static Logger log = LoggerFactory.getLogger(OCRController.class);
-
 
 
     @Autowired
@@ -45,25 +48,11 @@ public class OCRController {
         if (!file.isEmpty()) {
             try {
 
-                String orgName = file.getOriginalFilename();
+                BufferedImage image = Thumbnails.of(file.getInputStream()).scale(1).asBufferedImage(); //get autorotated image
 
+                OCRProcessor processor = new OCRProcessorImpl(request);
+                String[] jsonResult = processor.doOCR(image);
 
-                File imageFile = new File(orgName);
-                file.transferTo(imageFile);
-
-                String[] jsonResult = new String[0];
-
-                File pathtoImg = new File("/tmp/uploads/" + orgName); //todo ugly delete
-
-                if (pathtoImg.exists()) {
-
-                    OCRProcessor processor = new OCRProcessorImpl(request);
-                    jsonResult = processor.doOCR(pathtoImg);
-                }
-                else
-                {
-                    throw new Exception("Image was not saved on the disk.");
-                }
 
                 return new ResponseEntity(jsonResult, HttpStatus.ACCEPTED);
 
@@ -75,6 +64,8 @@ public class OCRController {
             return new ResponseEntity("You failed to upload file because the file was empty. ", HttpStatus.BAD_REQUEST);
         }
     }
+
+
 
 
     @RequestMapping(value = "/test", method = RequestMethod.POST)
@@ -89,7 +80,7 @@ public class OCRController {
         File dir = new File(path);
         if (!dir.exists()) {
             boolean iscreated = dir.mkdir();
-            if (! iscreated) {
+            if (!iscreated) {
                 throw new IOException("Directory " + path + " can not be created");
             }
         }
